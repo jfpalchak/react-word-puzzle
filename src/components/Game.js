@@ -3,61 +3,75 @@ import GameInfo from "./GameInfo";
 import WordPuzzle from "./WordPuzzle";
 import InputForm from "./InputForm";
 
-class Game extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      attemptsLeft: 6,
-      wordToGuess: 'word',
-      guessedLetters: [],
-      incorrectGuesses: []
-    };
-  }
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { guessLetterAdded, decrementAttemptsLeft } from "../reducers/gameSlice";
 
-  handleAddingGuessedLetter = (guess) => {
-    if (this.state.guessedLetters.includes(guess)) return;
+// class Game extends React.Component {
+  // constructor(props) {
+    //   super(props);
+    //   this.state = {
+      //     attemptsLeft: 6,
+      //     wordToGuess: 'word',
+      //     guessedLetters: [],
+      //     incorrectGuesses: []
+      //   };
+      // }
+function Game () {
 
-    const newGuessedLetters = [...this.state.guessedLetters, guess];
-    const incorrectGuess = !this.state.wordToGuess.includes(guess);
-    this.setState(prevState => ({
-      guessedLetters: newGuessedLetters,
-      attemptsLeft: incorrectGuess ? prevState.attemptsLeft - 1: prevState.attemptsLeft
-    }));
-  }
+  const dispatch = useDispatch();
+  const game = useSelector(state => state.game);
+  console.log(game);
 
-  render() {
-    const incorrectLetters = this.state.guessedLetters
-      .filter(letter => !this.state.wordToGuess.includes(letter));
-    const isLoser = this.state.attemptsLeft <= 0;
-    const isWinner = this.state.wordToGuess
-      .split("")
-      .every(letter => this.state.guessedLetters.includes(letter));
+  const handleAddingGuessedLetter = (guess) => {
+    if (game.guessedLetters.includes(guess) || guess.length > 1 ) return;
 
-    let winState = "";
+    // const newGuessedLetters = [...game.guessedLetters, guess];
+    const incorrectGuess = !game.wordToGuess.includes(guess);
 
-    if (isLoser) {
-      winState = "Game Over";
-    } else if (isWinner) {
-      winState = "You won!";
+    dispatch(guessLetterAdded(guess));
+    console.log('guessed');
+    if (incorrectGuess) {
+      dispatch(decrementAttemptsLeft());
     }
-
-    return(
-      <main>
-        <GameInfo 
-          wordToGuess={this.state.wordToGuess}
-          incorrectLetters={incorrectLetters}
-          attemptsLeft={this.state.attemptsLeft}
-          winState={winState} />
-        <WordPuzzle 
-          wordToGuess={this.state.wordToGuess} 
-          guessedLetters={this.state.guessedLetters}
-          attemptsLeft={this.state.attemptsLeft}/>
-          <div></div>
-        <InputForm 
-          onLetterInput={this.handleAddingGuessedLetter}/>
-      </main>
-    );
+    // this.setState(prevState => ({
+    //   guessedLetters: newGuessedLetters,
+    //   attemptsLeft: incorrectGuess ? prevState.attemptsLeft - 1: prevState.attemptsLeft
+    // }));
   }
+
+  const incorrectLetters = game.guessedLetters
+    .filter(letter => !game.wordToGuess.includes(letter));
+  const isLoser = game.attemptsLeft <= 0;
+  const isWinner = game.wordToGuess
+    .split("")
+    .every(letter => game.guessedLetters.includes(letter));
+
+  let winState = "";
+
+  if (isLoser) {
+    winState = "Game Over";
+  } else if (isWinner) {
+    winState = "You won!";
+  }
+
+  return(
+    <main>
+      <GameInfo 
+        wordToGuess={game.wordToGuess}
+        incorrectLetters={incorrectLetters}
+        attemptsLeft={game.attemptsLeft}
+        winState={winState} />
+      <WordPuzzle 
+        wordToGuess={game.wordToGuess} 
+        guessedLetters={game.guessedLetters}
+        attemptsLeft={game.attemptsLeft}/>
+        <div></div>
+      <InputForm 
+        onLetterInput={handleAddingGuessedLetter}/>
+    </main>
+  );
+
 }
 
 export default Game;

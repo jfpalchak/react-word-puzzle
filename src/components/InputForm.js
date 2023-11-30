@@ -4,7 +4,6 @@ function InputForm(props) {
 
   function submissionHandler(event) {
     event.preventDefault();
-
     props.onLetterInput(event.target.guess.value.toLowerCase());
   }
 

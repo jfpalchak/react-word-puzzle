@@ -34,6 +34,11 @@ main {
   grid-template-rows: 1fr 1fr;
 }
 
+/* GAME INFO */
+.game-info {
+  height: 250px;
+}
+
 /* WORD PUZZLE */
 
 .word-puzzle {
@@ -56,4 +61,5 @@ main {
 /* USER INPUT */
 .user-input {
   grid-column: 2/3;
+  position: relative;
 }
